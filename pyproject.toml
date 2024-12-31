@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools >= 43", "wheel", "setuptools_scm[toml] >= 3.4"]
+build-backend = "setuptools.build_meta"
+
+[tool.coverage.run]
+omit = [
+    "*/__main__.py",
+    "*/test_*",
+    "*/build/*",
+    "*/dist/*",
+    "*/.tox/*",
+    "*/.egg/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "pragma: no cover",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+show_error_codes = true
+warn_unused_ignores = false
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.pylint.messages_control]
+disable = [
+    "fixme",
+    "import-error",
+    "missing-module-docstring",
+    "too-few-public-methods",
+    "too-many-arguments",
+]
+
+[tool.pylint.typecheck]
+ignored-modules = ["pytest"]
+
+[tool.pytest.ini_options]
+log_level = "DEBUG"
+
+[tool.ruff]
+fix = true
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    # flake8-comprehensions
+    "C4",
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # Flynt
+    "FLY",
+    # isort
+    "I",
+    # Perflint
+    "PERF",
+    # Ruff-specific rules
+    "RUF",
+    # flake8-simplify
+    "SIM",
+    # flake8-type-checking
+    "TCH",
+    # pyupgrade
+    "UP",
+    # pycodestyle
+    "W",
+]
+
+[tool.setuptools_scm]

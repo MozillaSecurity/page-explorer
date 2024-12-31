@@ -1,0 +1,77 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+  - repo: https://github.com/ambv/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-ast
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-executables-have-shebangs
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: name-tests-test
+        args: ["--django"]
+      - id: requirements-txt-fixer
+      - id: trailing-whitespace
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        exclude_types: [json]
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.29.2
+    hooks:
+      - id: check-jsonschema
+        name: "Check prefpicker template schema"
+        files: ^src/site_scout/resources/prefpicker.yml
+        types: [yaml]
+        args: ["--schemafile", "https://raw.githubusercontent.com/MozillaSecurity/prefpicker/master/src/prefpicker/templates/schema.json"]
+  - repo: https://github.com/marco-c/taskcluster_yml_validator
+    rev: v0.0.11
+    hooks:
+      - id: taskcluster_yml
+  - repo: https://github.com/MozillaSecurity/orion-ci
+    rev: v0.0.10
+    hooks:
+      - id: orion_ci
+  - repo: meta
+    hooks:
+      - id: check-useless-excludes
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
+        args: [--contrib=contrib-title-conventional-commits, --ignore=body-is-missing, --msg-filename]
+        stages: [ commit-msg ]
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: tox -e mypy --
+        language: system
+        require_serial: true
+        types: [python]
+      - id: pylint
+        name: pylint
+        entry: tox -e pylint --
+        language: system
+        require_serial: true
+        types: [python]
+
+default_language_version:
+  python: python3
