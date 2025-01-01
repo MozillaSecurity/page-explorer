@@ -167,10 +167,8 @@ def test_page_explorer_explore(mocker, instructions, found_elements, expected):
     driver = mocker.patch(
         "page_explorer.page_explorer.FirefoxDriver", autospec=True
     ).return_value
-    mocker.patch("page_explorer.page_explorer.sleep", autospec=True)
     driver.find_elements.side_effect = found_elements
 
     with PageExplorer("bin", 1234) as exp:
-        result = exp.explore(instructions=instructions)
-    # assert driver.explore.call_count == 1
+        result = exp.explore(instructions=instructions, wait_cb=mocker.MagicMock())
     assert result == expected
