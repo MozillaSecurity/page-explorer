@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import Enum, auto, unique
 from logging import getLogger
 from time import perf_counter, sleep
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from selenium.common.exceptions import (
     ElementNotInteractableException,
@@ -53,7 +53,7 @@ class Instruction:
     action: Action
     delay: float = 0
     runs: int = 1
-    value: Any | None = None
+    value: Any = None
 
 
 DEFAULT_INSTRUCTIONS = (
@@ -129,8 +129,7 @@ class PageExplorer:
         return self
 
     def __exit__(self, *exc: object) -> None:
-        with suppress(HTTPError, WebDriverException):
-            self._driver.quit()
+        self.shutdown()
 
     def close_browser(self, wait: int = 0, poll: float = 0.5) -> None:
         """Attempt to execute 'window.close()' on the browser.
@@ -164,12 +163,15 @@ class PageExplorer:
 
     # pylint: disable=too-many-branches
     def explore(
-        self, instructions: tuple[Instruction, ...] = DEFAULT_INSTRUCTIONS
+        self,
+        instructions: tuple[Instruction, ...] = DEFAULT_INSTRUCTIONS,
+        wait_cb: Callable[[float], None] = sleep,
     ) -> bool:
         """Interact with active page by executing provided instructions.
 
         Args:
             instructions: Instructions to perform.
+            wait_cb: Function used to delay execution.
 
         Returns:
             True if all instructions were successfully executed otherwise False.
@@ -211,16 +213,16 @@ class PageExplorer:
                                     *cast(tuple[str, ...], instruction.value)
                                 )
                             if instruction.delay > 0:
-                                sleep(instruction.delay)
+                                wait_cb(instruction.delay)
                     else:
                         for _ in range(instruction.runs):
                             actions.send_keys(
                                 *cast(tuple[str, ...], instruction.value)
                             ).perform()
                             if instruction.delay > 0:
-                                sleep(instruction.delay)
+                                wait_cb(instruction.delay)
                 elif instruction.action == Action.WAIT:
-                    sleep(cast(float, instruction.value))
+                    wait_cb(cast(float, instruction.value))
 
             # all instructions complete
             success = True
@@ -253,3 +255,15 @@ class PageExplorer:
         except WebDriverException as exc:
             LOG.debug("no browser connection: %s", exc.msg)
         return success
+
+    def shutdown(self) -> None:
+        """Shutdown driver.
+
+        Args:
+            None
+
+        Returns:
+            None.
+        """
+        with suppress(HTTPError, WebDriverException):
+            self._driver.quit()
