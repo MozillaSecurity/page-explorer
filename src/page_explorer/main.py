@@ -46,6 +46,8 @@ def main(argv: list[str] | None = None) -> int:
             LOG.info("Done. (%0.1fs)", perf_counter() - start)
             if not success:
                 LOG.info("Load failed!")
+                if explorer.is_connected():
+                    LOG.info("Server not found.")
             else:
                 LOG.info("Exploring...")
                 start = perf_counter()
@@ -53,7 +55,8 @@ def main(argv: list[str] | None = None) -> int:
                 LOG.info("Done. (%0.1fs)", perf_counter() - start)
                 if not success:
                     LOG.info("Could not complete exploration!")
-                else:
+                if explorer.is_connected():
+                    LOG.info("Closing browser...")
                     explorer.close_browser(wait=5)
 
     except KeyboardInterrupt:  # pragma: no cover
@@ -61,5 +64,6 @@ def main(argv: list[str] | None = None) -> int:
 
     finally:
         LOG.warning("Shutting down...")
+    LOG.info("Done.")
 
     return 0
