@@ -154,10 +154,7 @@ class PageExplorer:
         if perform_wait:
             deadline = perf_counter() + wait
             while deadline > perf_counter():
-                try:
-                    self._driver.title
-                except (HTTPError, WebDriverException):
-                    LOG.debug("connection has closed")
+                if not self.is_connected():
                     break
                 sleep(poll)
 
@@ -255,6 +252,21 @@ class PageExplorer:
         except WebDriverException as exc:
             LOG.debug("no browser connection: %s", exc.msg)
         return success
+
+    def is_connected(self) -> bool:
+        """Check if a page is open and connection is active.
+
+        Args:
+            None
+
+        Returns:
+            True if a page is open and connection is active otherwise False.
+        """
+        try:
+            return isinstance(self._driver.title, str)
+        except (HTTPError, WebDriverException):
+            LOG.debug("connection has closed")
+        return False
 
     def shutdown(self) -> None:
         """Shutdown driver.

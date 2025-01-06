@@ -3,7 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # You can obtain one at http://mozilla.org/MPL/2.0/.
 # pylint: disable=missing-docstring
-from itertools import count
+from itertools import count, repeat
 from unittest.mock import Mock
 
 from pytest import mark, raises
@@ -42,10 +42,28 @@ def test_page_explorer_create(mocker, exc):
 
 
 @mark.parametrize(
+    "title_effect, result",
+    (
+        # connected
+        (("foo",), True),
+        # not connected
+        ((WebDriverException("test"),), False),
+    ),
+)
+def test_page_explorer_is_connected(mocker, title_effect, result):
+    """test PageExplorer.is_connected()"""
+    driver = mocker.patch("page_explorer.page_explorer.FirefoxDriver", autospec=True)
+    type(driver.return_value).title = mocker.PropertyMock(side_effect=title_effect)
+
+    with PageExplorer("bin", 1234) as exp:
+        assert exp.is_connected() == result
+
+
+@mark.parametrize(
     "title_calls, title_effect, script_effect",
     (
         # wait until deadline is exceeded
-        (9, None, None),
+        (4, repeat("foo"), None),
         # successfully close the browser
         (1, (WebDriverException("test"),), None),
         # failed to send window.close()
@@ -64,7 +82,7 @@ def test_page_explorer_close_browser(mocker, title_calls, title_effect, script_e
     type(driver).title = fake_title
     driver.execute_script.side_effect = script_effect
     with PageExplorer("bin", 1234) as exp:
-        exp.close_browser(wait=10)
+        exp.close_browser(wait=5)
     assert driver.execute_script.call_count == 1
     assert fake_title.call_count == title_calls
 
