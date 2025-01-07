@@ -110,6 +110,7 @@ class PageExplorer:
         options = Options()
         options.binary_location = str(binary)
         options.enable_bidi = True
+        options.page_load_strategy = "eager"
         service = Service(
             service_args=[f"--marionette-port={port}", "--connect-existing"],
         )
