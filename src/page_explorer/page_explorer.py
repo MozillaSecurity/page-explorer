@@ -7,6 +7,7 @@ from contextlib import suppress
 from dataclasses import dataclass
 from enum import Enum, auto, unique
 from logging import getLogger
+from os import environ
 from time import perf_counter, sleep
 from typing import TYPE_CHECKING, Any, Callable, cast
 
@@ -102,6 +103,9 @@ class PageExplorer:
             port: Listening browser control port to connect to.
             implicitly_wait: Maximum amount of time for Selenium commands to wait.
         """
+        # disable data collection
+        # https://www.selenium.dev/documentation/selenium_manager/#data-collection
+        environ["SE_AVOID_STATS"] = "true"
         # Setup the options for connecting to an existing Firefox instance
         options = Options()
         options.binary_location = str(binary)
