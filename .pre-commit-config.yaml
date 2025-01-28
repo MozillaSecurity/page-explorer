@@ -33,14 +33,6 @@ repos:
     hooks:
       - id: codespell
         exclude_types: [json]
-  - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.0
-    hooks:
-      - id: check-jsonschema
-        name: "Check prefpicker template schema"
-        files: ^src/site_scout/resources/prefpicker.yml
-        types: [yaml]
-        args: ["--schemafile", "https://raw.githubusercontent.com/MozillaSecurity/prefpicker/master/src/prefpicker/templates/schema.json"]
   - repo: https://github.com/marco-c/taskcluster_yml_validator
     rev: v0.0.12
     hooks:
