@@ -163,16 +163,14 @@ class PageExplorer:
             None.
         """
         assert wait >= 0
-        perform_wait = wait > 0
         LOG.debug("executing 'window.close()'")
         try:
             self._driver.execute_script(
-                "window.close()"
+                "try { window.close() } catch(e) { }"
             )  # type: ignore[no-untyped-call]
         except (HTTPError, WebDriverException):
-            perform_wait = False
             LOG.debug("no browser connection")
-        if perform_wait:
+        else:
             deadline = perf_counter() + wait
             while deadline > perf_counter():
                 if not self.is_connected():
