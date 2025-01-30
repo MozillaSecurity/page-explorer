@@ -66,28 +66,44 @@ DEFAULT_INSTRUCTIONS = (
     # Attempt to trigger animations
     Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
     Instruction(Action.SEND_KEYS, value=(Keys.PAGE_DOWN,), runs=10, delay=0.2),
-    Instruction(Action.SEND_KEYS, value=(Keys.PAGE_UP,), runs=10, delay=0.2),
+    Instruction(Action.SEND_KEYS, value=(Keys.PAGE_UP,), runs=10, delay=0.1),
     # Select some text
     Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
     Instruction(Action.KEY_DOWN, value=Keys.SHIFT),
     Instruction(Action.SEND_KEYS, value=(Keys.PAGE_DOWN,)),
     Instruction(Action.KEY_UP, value=Keys.SHIFT),
     Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
-    Instruction(Action.WAIT, value=5),
+    Instruction(Action.WAIT, value=1),
     # Tab across elements
     Instruction(Action.SEND_KEYS, value=(Keys.TAB,), runs=25),
     Instruction(Action.WAIT, value=1),
-    # Find all elements
+    # Zoom in/out
+    Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
+    Instruction(
+        Action.EXECUTE_SCRIPT,
+        value="try { document.body.style.zoom='150%' } catch(e) { }",
+    ),
+    Instruction(Action.WAIT, value=1),
+    Instruction(
+        Action.EXECUTE_SCRIPT,
+        value="try { document.body.style.zoom='33%' } catch(e) { }",
+    ),
+    Instruction(Action.WAIT, value=1),
+    Instruction(
+        Action.EXECUTE_SCRIPT,
+        value="try { document.body.style.zoom='100%' } catch(e) { }",
+    ),
+    Instruction(Action.WAIT, value=1),
+    # Find all elements and send ESC
     Instruction(Action.FIND_ELEMENTS, value={"by": By.XPATH, "value": ".//*"}),
-    # Send ESC to some elements
     Instruction(Action.SEND_KEYS, value=(Keys.ESCAPE,), runs=25),
-    # clear elements
     Instruction(Action.CLEAR_ELEMENTS),
-    # Call GC
+    # Call GC (requires fuzzing builds)
     Instruction(
         Action.EXECUTE_SCRIPT,
         value="try { FuzzingFunctions.memoryPressure() } catch(e) { }",
     ),
+    Instruction(Action.WAIT, value=1),
 )
 
 
