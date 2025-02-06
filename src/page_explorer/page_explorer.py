@@ -177,6 +177,20 @@ class PageExplorer:
                     break
                 sleep(poll)
 
+    @property
+    def current_url(self) -> str | None:
+        """Gets the URL of the current path.
+
+        Args:
+            None
+
+        Returns:
+            The URL if it is available otherwise None.
+        """
+        with suppress(HTTPError, WebDriverException):
+            return self._driver.current_url
+        return None
+
     # pylint: disable=too-many-branches
     def explore(
         self,
@@ -281,10 +295,9 @@ class PageExplorer:
         Returns:
             True if a page is open and connection is active otherwise False.
         """
-        try:
+        with suppress(HTTPError, WebDriverException):
             return isinstance(self._driver.title, str)
-        except (HTTPError, WebDriverException):
-            LOG.debug("connection has closed")
+        LOG.debug("connection has closed")
         return False
 
     def shutdown(self) -> None:
