@@ -6,3 +6,5 @@ Page Explorer
 [![PyPI](https://img.shields.io/pypi/v/page-explorer)](https://pypi.org/project/page-explorer)
 
 Page Explorer facilitates content interactions via instructions.
+
+See [Site-Scout](/MozillaSecurity/site-scout) to see it in action.
