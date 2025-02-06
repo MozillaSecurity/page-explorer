@@ -60,6 +60,24 @@ def test_page_explorer_is_connected(mocker, title_effect, result):
 
 
 @mark.parametrize(
+    "url_effect, result",
+    (
+        # connected
+        (("foo",), "foo"),
+        # not connected
+        ((WebDriverException("test"),), None),
+    ),
+)
+def test_page_explorer_current_url(mocker, url_effect, result):
+    """test PageExplorer.current_url"""
+    driver = mocker.patch("page_explorer.page_explorer.FirefoxDriver", autospec=True)
+    type(driver.return_value).current_url = mocker.PropertyMock(side_effect=url_effect)
+
+    with PageExplorer("bin", 1234) as exp:
+        assert exp.current_url == result
+
+
+@mark.parametrize(
     "title_calls, title_effect, script_effect",
     (
         # wait until deadline is exceeded
