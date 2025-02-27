@@ -25,10 +25,8 @@ def test_page_explorer_create(mocker, exc):
     driver = mocker.patch("page_explorer.page_explorer.FirefoxDriver", autospec=True)
 
     # create a PageExplorer object
-    # raise on call to implicitly_wait() for coverage
-    driver.return_value.implicitly_wait.side_effect = (exc,)
     with PageExplorer("bin", 1234):
-        assert driver.return_value.implicitly_wait.call_count == 1
+        pass
     assert driver.return_value.quit.call_count == 1
     driver.reset_mock()
 

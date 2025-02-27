@@ -112,12 +112,11 @@ class PageExplorer:
 
     __slots__ = ("_driver",)
 
-    def __init__(self, binary: Path, port: int, implicitly_wait: float = 30):
+    def __init__(self, binary: Path, port: int):
         """
         Args:
             binary: Browser binary that is currently running.
             port: Listening browser control port to connect to.
-            implicitly_wait: Maximum amount of time for Selenium commands to wait.
         """
         # disable data collection
         # https://www.selenium.dev/documentation/selenium_manager/#data-collection
@@ -125,7 +124,6 @@ class PageExplorer:
         # Setup the options for connecting to an existing Firefox instance
         options = Options()
         options.binary_location = str(binary)
-        options.enable_bidi = True
         options.page_load_strategy = "eager"
         service = Service(
             service_args=[f"--marionette-port={port}", "--connect-existing"],
@@ -139,12 +137,7 @@ class PageExplorer:
             LOG.error("Failed to create driver: %s", exc.msg)
             raise ExplorerError("Failed to create PageExplorer") from None
         LOG.debug("connected to browser on port: %d", port)
-        try:
-            self._driver.implicitly_wait(time_to_wait=implicitly_wait)
-        except HTTPError:
-            LOG.debug("suppressing HTTPError")
-        except WebDriverException as exc:
-            LOG.debug("no browser connection: %s", exc.msg)
+
 
     def __enter__(self) -> PageExplorer:
         return self
