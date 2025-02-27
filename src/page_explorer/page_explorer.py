@@ -130,14 +130,13 @@ class PageExplorer:
         )
         try:
             self._driver = FirefoxDriver(options=options, service=service)
-        except HTTPError:
-            LOG.debug("suppressing HTTPError")
+        except HTTPError as exc:
+            LOG.debug("suppressing HTTPError: %s", exc)
             raise ExplorerError("Failed to create PageExplorer") from None
         except WebDriverException as exc:
-            LOG.error("Failed to create driver: %s", exc.msg)
+            LOG.error("Failed to create WebDriver: %s", exc.msg)
             raise ExplorerError("Failed to create PageExplorer") from None
         LOG.debug("connected to browser on port: %d", port)
-
 
     def __enter__(self) -> PageExplorer:
         return self
@@ -172,7 +171,7 @@ class PageExplorer:
 
     @property
     def current_url(self) -> str | None:
-        """Gets the URL of the current path.
+        """Get the URL of the current page.
 
         Args:
             None
@@ -250,12 +249,12 @@ class PageExplorer:
             # all instructions complete
             success = True
 
-        except HTTPError:
-            LOG.debug("suppressing HTTPError")
+        except HTTPError as exc:
+            LOG.debug("suppressing HTTPError: %s", exc)
         except WebDriverException as exc:
             LOG.debug("failed processing instructions: %s", exc.msg)
         finally:
-            LOG.debug("%d/%d instructions", idx + 1, len(instructions))
+            LOG.debug("%d/%d instructions executed", idx + 1, len(instructions))
 
         return success
 
@@ -273,8 +272,8 @@ class PageExplorer:
             self._driver.get(url)
             success = self._driver.title != "Server Not Found"
             LOG.debug("page: %r (%r)", self._driver.title, self._driver.current_url)
-        except HTTPError:
-            LOG.debug("suppressing HTTPError")
+        except HTTPError as exc:
+            LOG.debug("suppressing HTTPError: %s", exc)
         except WebDriverException as exc:
             LOG.debug("no browser connection: %s", exc.msg)
         return success
