@@ -267,16 +267,16 @@ class PageExplorer:
         Returns:
             True if URL is successfully loaded otherwise False.
         """
-        success = False
         try:
             self._driver.get(url)
-            success = self._driver.title != "Server Not Found"
-            LOG.debug("page: %r (%r)", self._driver.title, self._driver.current_url)
         except HTTPError as exc:
             LOG.debug("suppressing HTTPError: %s", exc)
         except WebDriverException as exc:
             LOG.debug("no browser connection: %s", exc.msg)
-        return success
+        else:
+            LOG.debug("load event received")
+            return True
+        return False
 
     def is_connected(self) -> bool:
         """Check if a page is open and connection is active.
@@ -303,3 +303,17 @@ class PageExplorer:
         """
         with suppress(HTTPError, WebDriverException):
             self._driver.quit()
+
+    @property
+    def title(self) -> str | None:
+        """Get the title of the current page.
+
+        Args:
+            None
+
+        Returns:
+            The page title if it is available otherwise None.
+        """
+        with suppress(HTTPError, WebDriverException):
+            return self._driver.title
+        return None

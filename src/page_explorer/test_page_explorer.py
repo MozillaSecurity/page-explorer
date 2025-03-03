@@ -104,25 +104,22 @@ def test_page_explorer_close_browser(mocker, title_calls, title_effect, script_e
 
 
 @mark.parametrize(
-    "fake_title, get_effect, expected",
+    "get_effect, expected",
     (
         # successfully get a url
-        ("foo", None, True),
+        (None, True),
         # get non-existing url
-        ("Server Not Found", None, False),
-        # get non-existing url
-        ("foo", (WebDriverException("test"),), False),
+        ((WebDriverException("test"),), False),
         # browser connection error
-        ("foo", (HTTPError(),), False),
+        ((HTTPError(),), False),
     ),
 )
-def test_page_explorer_get(mocker, fake_title, get_effect, expected):
+def test_page_explorer_get(mocker, get_effect, expected):
     """test PageExplorer.get()"""
     driver = mocker.patch(
         "page_explorer.page_explorer.FirefoxDriver", autospec=True
     ).return_value
 
-    driver.title = fake_title
     driver.get.side_effect = get_effect
     with PageExplorer("bin", 1234) as exp:
         result = exp.get("http://foo.com")
@@ -206,3 +203,21 @@ def test_page_explorer_explore(mocker, instructions, found_elements, expected):
     with PageExplorer("bin", 1234) as exp:
         result = exp.explore(instructions=instructions, wait_cb=mocker.MagicMock())
     assert result == expected
+
+
+@mark.parametrize(
+    "title_effect, result",
+    (
+        # connected
+        (("foo",), "foo"),
+        # not connected
+        ((WebDriverException("test"),), None),
+    ),
+)
+def test_page_explorer_title(mocker, title_effect, result):
+    """test PageExplorer.title"""
+    driver = mocker.patch("page_explorer.page_explorer.FirefoxDriver", autospec=True)
+    type(driver.return_value).title = mocker.PropertyMock(side_effect=title_effect)
+
+    with PageExplorer("bin", 1234) as exp:
+        assert exp.title == result
