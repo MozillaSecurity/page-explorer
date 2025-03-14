@@ -164,9 +164,7 @@ class PageExplorer:
             LOG.debug("no browser connection")
         else:
             deadline = perf_counter() + wait
-            while deadline > perf_counter():
-                if not self.is_connected():
-                    break
+            while deadline > perf_counter() and self.is_connected():
                 sleep(poll)
 
     @property
@@ -245,17 +243,14 @@ class PageExplorer:
                                 wait_cb(instruction.delay)
                 elif instruction.action == Action.WAIT:
                     wait_cb(cast(float, instruction.value))
-
             # all instructions complete
             success = True
-
         except HTTPError as exc:
-            LOG.debug("suppressing HTTPError: %s", exc)
+            LOG.debug("explore - HTTPError: %s", exc)
         except WebDriverException as exc:
-            LOG.debug("failed processing instructions: %s", exc.msg)
+            LOG.debug("explore - WebDriverException: %s", exc.msg)
         finally:
             LOG.debug("%d/%d instructions executed", idx + 1, len(instructions))
-
         return success
 
     def get(self, url: str) -> bool:
@@ -270,9 +265,9 @@ class PageExplorer:
         try:
             self._driver.get(url)
         except HTTPError as exc:
-            LOG.debug("suppressing HTTPError: %s", exc)
+            LOG.debug("get - HTTPError: %s", exc)
         except WebDriverException as exc:
-            LOG.debug("no browser connection: %s", exc.msg)
+            LOG.debug("get - WebDriverException: %s", exc.msg)
         else:
             LOG.debug("load event received")
             return True
@@ -289,7 +284,6 @@ class PageExplorer:
         """
         with suppress(HTTPError, WebDriverException):
             return isinstance(self._driver.title, str)
-        LOG.debug("connection has closed")
         return False
 
     def shutdown(self) -> None:
