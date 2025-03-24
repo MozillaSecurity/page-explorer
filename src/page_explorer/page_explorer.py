@@ -75,7 +75,7 @@ DEFAULT_INSTRUCTIONS = (
     Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
     Instruction(Action.WAIT, value=1),
     # Tab across elements
-    Instruction(Action.SEND_KEYS, value=(Keys.TAB,), runs=25),
+    Instruction(Action.SEND_KEYS, value=(Keys.TAB,), runs=25, delay=0.1),
     Instruction(Action.WAIT, value=1),
     # Zoom in/out
     Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
@@ -96,7 +96,7 @@ DEFAULT_INSTRUCTIONS = (
     Instruction(Action.WAIT, value=1),
     # Find all elements and send ESC
     Instruction(Action.FIND_ELEMENTS, value={"by": By.XPATH, "value": ".//*"}),
-    Instruction(Action.SEND_KEYS, value=(Keys.ESCAPE,), runs=25),
+    Instruction(Action.SEND_KEYS, value=(Keys.ESCAPE,), runs=25, delay=0.1),
     Instruction(Action.CLEAR_ELEMENTS),
     # Call GC (requires fuzzing builds)
     Instruction(
