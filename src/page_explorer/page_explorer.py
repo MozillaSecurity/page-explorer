@@ -158,8 +158,8 @@ class PageExplorer:
         LOG.debug("executing 'window.close()'")
         try:
             self._driver.execute_script(
-                "try { window.close() } catch(e) { }"
-            )  # type: ignore[no-untyped-call]
+                "try { window.close() } catch(e) { }"  # type: ignore[no-untyped-call]
+            )
         except (HTTPError, WebDriverException):
             LOG.debug("no browser connection")
         else:
@@ -210,8 +210,8 @@ class PageExplorer:
                     elements = None
                 elif instruction.action == Action.EXECUTE_SCRIPT:
                     self._driver.execute_script(
-                        instruction.value
-                    )  # type: ignore[no-untyped-call]
+                        instruction.value  # type: ignore[no-untyped-call]
+                    )
                 elif instruction.action == Action.FIND_ELEMENTS:
                     elements = self._driver.find_elements(
                         **cast(dict[str, str], instruction.value)
