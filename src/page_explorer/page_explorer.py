@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from enum import Enum, auto, unique
 from logging import getLogger
 from os import environ
+from string import ascii_lowercase, ascii_uppercase
 from time import perf_counter, sleep
 from typing import TYPE_CHECKING, Any, Callable, cast
 
@@ -18,6 +19,7 @@ from selenium.common.exceptions import (
 )
 from selenium.webdriver import Firefox as FirefoxDriver
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
@@ -290,6 +292,40 @@ class PageExplorer:
         """
         with suppress(HTTPError, WebDriverException):
             self._driver.quit()
+
+    def skip_to_content(self) -> None:
+        """Attempt to find and activate a "Skip to Content" link.
+        This can dismiss some dialogs and scroll the page to the main content.
+
+        https://webaim.org/ can be used to test the feature.
+
+        Args:
+            None
+
+        Returns:
+            None.
+        """
+        try:
+            elements = self._driver.find_elements(
+                by=By.XPATH,
+                value=(
+                    "//a[starts-with("
+                    f"translate(text(), '{ascii_uppercase}', '{ascii_lowercase}'), "
+                    "'skip to '"
+                    ")]"
+                ),
+            )
+            if not elements:
+                LOG.debug("'skip to content' link not found")
+                return
+            actions = ActionChains(self._driver)
+            actions.move_to_element(elements[0]).perform()
+            actions.click(elements[0])
+            actions.send_keys(Keys.ENTER).perform()
+        except HTTPError as exc:
+            LOG.debug("skip_to_content - HTTPError: %s", exc)
+        except WebDriverException as exc:
+            LOG.debug("skip_to_content - WebDriverException: %s", exc.msg)
 
     @property
     def title(self) -> str | None:

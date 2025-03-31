@@ -221,3 +221,29 @@ def test_page_explorer_title(mocker, title_effect, result):
 
     with PageExplorer("bin", 1234) as exp:
         assert exp.title == result
+
+
+@mark.parametrize(
+    "elements, move_to",
+    (
+        # link not found
+        (0, None),
+        # link found
+        (1, None),
+        # handle failure
+        (1, (HTTPError(),)),
+        # handle failure
+        (1, (WebDriverException("test"),)),
+    ),
+)
+def test_page_explorer_skip_to_content(mocker, elements, move_to):
+    """test PageExplorer.skip_to_content()"""
+    chain = mocker.patch("page_explorer.page_explorer.ActionChains", autospec=True)
+    chain.return_value.move_to_element.side_effect = move_to
+    driver = mocker.patch(
+        "page_explorer.page_explorer.FirefoxDriver", autospec=True
+    ).return_value
+    driver.find_elements.return_value = [mocker.Mock() for _ in range(elements)]
+    with PageExplorer("bin", 1234) as exp:
+        exp.skip_to_content()
+    assert chain.call_count == (1 if elements else 0)
