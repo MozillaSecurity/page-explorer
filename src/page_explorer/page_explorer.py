@@ -58,8 +58,6 @@ class Instruction:
 
 
 DEFAULT_INSTRUCTIONS = (
-    # wait for the page to load more content
-    Instruction(Action.WAIT, value=10),
     # Find the end of the page/load more content
     Instruction(Action.SEND_KEYS, value=(Keys.END,), runs=5, delay=0.1),
     Instruction(Action.WAIT, value=1),
@@ -67,6 +65,7 @@ DEFAULT_INSTRUCTIONS = (
     Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
     Instruction(Action.SEND_KEYS, value=(Keys.PAGE_DOWN,), runs=10, delay=0.2),
     Instruction(Action.SEND_KEYS, value=(Keys.PAGE_UP,), runs=10, delay=0.1),
+    Instruction(Action.WAIT, value=1),
     # Select some text
     Instruction(Action.SEND_KEYS, value=(Keys.HOME,)),
     Instruction(Action.KEY_DOWN, value=Keys.SHIFT),
