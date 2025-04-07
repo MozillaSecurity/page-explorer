@@ -319,8 +319,11 @@ class PageExplorer:
                 LOG.debug("'skip to content' link not found")
                 return
             actions = ActionChains(self._driver)
-            actions.move_to_element(elements[0]).perform()
-            actions.click(elements[0])
+            # this can fail in some cases but seems to be required
+            with suppress(WebDriverException):
+                actions.scroll_to_element(elements[0]).perform()
+                actions.move_to_element(elements[0]).perform()
+                actions.click(elements[0])
             actions.send_keys(Keys.ENTER).perform()
         except HTTPError as exc:
             LOG.debug("skip_to_content - HTTPError: %s", exc)
