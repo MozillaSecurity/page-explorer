@@ -224,7 +224,7 @@ def test_page_explorer_title(mocker, title_effect, result):
 
 
 @mark.parametrize(
-    "elements, move_to",
+    "elements, send_keys",
     (
         # link not found
         (0, None),
@@ -236,10 +236,10 @@ def test_page_explorer_title(mocker, title_effect, result):
         (1, (WebDriverException("test"),)),
     ),
 )
-def test_page_explorer_skip_to_content(mocker, elements, move_to):
+def test_page_explorer_skip_to_content(mocker, elements, send_keys):
     """test PageExplorer.skip_to_content()"""
     chain = mocker.patch("page_explorer.page_explorer.ActionChains", autospec=True)
-    chain.return_value.move_to_element.side_effect = move_to
+    chain.return_value.send_keys.side_effect = send_keys
     driver = mocker.patch(
         "page_explorer.page_explorer.FirefoxDriver", autospec=True
     ).return_value
