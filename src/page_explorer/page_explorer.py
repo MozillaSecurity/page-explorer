@@ -59,6 +59,8 @@ class Instruction:
 
 
 DEFAULT_INSTRUCTIONS = (
+    # Attempt to dismiss any potential overlay content
+    Instruction(Action.SEND_KEYS, value=(Keys.ESCAPE,)),
     # Find the end of the page/load more content
     Instruction(Action.SEND_KEYS, value=(Keys.END,), runs=5, delay=0.1),
     Instruction(Action.WAIT, value=1),
