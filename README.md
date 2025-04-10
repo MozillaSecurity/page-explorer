@@ -7,4 +7,4 @@ Page Explorer
 
 Page Explorer facilitates content interactions via instructions.
 
-See [Site-Scout](/MozillaSecurity/site-scout) to see it in action.
+See [Site-Scout](//github.com/MozillaSecurity/site-scout) to see it in action.
