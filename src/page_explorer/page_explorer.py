@@ -29,6 +29,14 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 LOG = getLogger(__name__)
+PAGE_LOAD_STRATEGIES = (
+    # some content may still be loading (document.readyState="interactive")
+    "eager",
+    # does not block
+    "none",
+    # waits for all resources to download (document.readyState="complete")
+    "normal",
+)
 
 
 @unique
@@ -109,19 +117,23 @@ class PageExplorer:
 
     __slots__ = ("_driver",)
 
-    def __init__(self, binary: Path, port: int):
+    def __init__(
+        self, binary: Path, port: int, page_load_strategy: str = "normal"
+    ) -> None:
         """
         Args:
             binary: Browser binary that is currently running.
             port: Listening browser control port to connect to.
+            page_load_strategy: Wait for certain 'document.readyState' when loading.
         """
+        assert page_load_strategy in PAGE_LOAD_STRATEGIES
         # disable data collection
         # https://www.selenium.dev/documentation/selenium_manager/#data-collection
         environ["SE_AVOID_STATS"] = "true"
         # Setup the options for connecting to an existing Firefox instance
         options = Options()
         options.binary_location = str(binary)
-        options.page_load_strategy = "eager"
+        options.page_load_strategy = page_load_strategy
         service = Service(
             service_args=[f"--marionette-port={port}", "--connect-existing"],
         )
