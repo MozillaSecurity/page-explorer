@@ -7,7 +7,7 @@ from logging import DEBUG, ERROR, INFO, WARNING, basicConfig, getLogger
 from time import perf_counter
 
 from .args import parse_args
-from .page_explorer import PageExplorer
+from .page_explorer import PageExplorer, PageLoad
 
 LOG = getLogger(__name__)
 getLogger("selenium").setLevel(WARNING)
@@ -42,10 +42,9 @@ def main(argv: list[str] | None = None) -> int:
         with PageExplorer(args.binary.resolve(), port=args.port) as explorer:
             LOG.info("Loading %r...", args.url)
             start = perf_counter()
-            success = explorer.get(args.url)
-            LOG.info("Done. (%0.1fs)", perf_counter() - start)
-            if not success:
-                LOG.info("Load failed!")
+            page_load = explorer.get(args.url)
+            LOG.info("Load: %s (%0.1fs)", page_load.name, perf_counter() - start)
+            if page_load == PageLoad.FAILURE:
                 if explorer.is_connected():
                     LOG.info("Server not found.")
             else:

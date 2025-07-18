@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from contextlib import suppress
 from dataclasses import dataclass
-from enum import Enum, auto, unique
+from enum import Enum, auto
 from logging import getLogger
 from os import environ
 from string import ascii_lowercase, ascii_uppercase
@@ -39,7 +39,6 @@ PAGE_LOAD_STRATEGIES = (
 )
 
 
-@unique
 class Action(Enum):
     """Supported actions that can be performed."""
 
@@ -64,6 +63,14 @@ class Instruction:
     delay: float = 0
     runs: int = 1
     value: Any = None
+
+
+class PageLoad(Enum):
+    """Page load result."""
+
+    FAILURE = auto()
+    SUCCESS = auto()
+    TIMEOUT = auto()
 
 
 DEFAULT_INSTRUCTIONS = (
@@ -262,8 +269,9 @@ class PageExplorer:
             LOG.debug("%d/%d instructions executed", idx + 1, len(instructions))
         return success
 
-    def get(self, url: str) -> bool:
+    def get(self, url: str, wait: int = 90) -> PageLoad:
         """Attempt to navigate to a provided URL.
+        NOTE: When the browser is very busy an HTTPError is raised after 120 seconds.
 
         Args:
             url: URL to load.
@@ -272,15 +280,21 @@ class PageExplorer:
             True if URL is successfully loaded otherwise False.
         """
         try:
+            if wait > 0:
+                self._driver.set_page_load_timeout(wait)
             self._driver.get(url)
         except HTTPError as exc:
             LOG.debug("get - HTTPError: %s", exc)
+            if "timed out" in str(exc):
+                return PageLoad.TIMEOUT
         except WebDriverException as exc:
+            if wait > 0 and "Navigation timed out after" in str(exc):
+                return PageLoad.TIMEOUT
             LOG.debug("get - WebDriverException: %s", exc.msg)
         else:
             LOG.debug("load event received")
-            return True
-        return False
+            return PageLoad.SUCCESS
+        return PageLoad.FAILURE
 
     def is_connected(self) -> bool:
         """Check if a page is open and connection is active.

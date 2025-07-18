@@ -6,17 +6,18 @@
 from pytest import mark
 
 from .main import init_logging, main
+from .page_explorer import PageLoad
 
 
 @mark.parametrize(
     "exp_get, exp_explore",
     (
         # navigating to page fails
-        (False, False),
+        (PageLoad.FAILURE, False),
         # exploring page fails
-        (True, False),
+        (PageLoad.SUCCESS, False),
         # success, result found
-        (True, True),
+        (PageLoad.SUCCESS, True),
     ),
 )
 def test_main(mocker, exp_get, exp_explore):
@@ -28,7 +29,7 @@ def test_main(mocker, exp_get, exp_explore):
     exp.explore.return_value = exp_explore
     assert main(["foo.bin", "http://test.url", "1234"]) == 0
     assert exp.get.call_count == 1
-    assert exp.explore.call_count == (1 if exp_get else 0)
+    assert exp.explore.call_count == (1 if exp_get == PageLoad.SUCCESS else 0)
 
 
 @mark.parametrize("level", ("DEBUG", "INFO"))

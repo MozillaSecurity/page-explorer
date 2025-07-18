@@ -16,6 +16,7 @@ from .page_explorer import (
     ExplorerError,
     Instruction,
     PageExplorer,
+    PageLoad,
 )
 
 
@@ -107,11 +108,15 @@ def test_page_explorer_close_browser(mocker, title_calls, title_effect, script_e
     "get_effect, expected",
     (
         # successfully get a url
-        (None, True),
+        (None, PageLoad.SUCCESS),
         # get non-existing url
-        ((WebDriverException("test"),), False),
+        ((WebDriverException("test"),), PageLoad.FAILURE),
         # browser connection error
-        ((HTTPError(),), False),
+        ((HTTPError(),), PageLoad.FAILURE),
+        # timeout
+        ((WebDriverException("Navigation timed out after..."),), PageLoad.TIMEOUT),
+        # timeout
+        ((HTTPError("Read timed out. (read timeout=120)"),), PageLoad.TIMEOUT),
     ),
 )
 def test_page_explorer_get(mocker, get_effect, expected):
