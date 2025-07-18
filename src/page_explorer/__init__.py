@@ -3,6 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """page explorer module"""
 
-from .page_explorer import ExplorerError, PageExplorer
+from .page_explorer import ExplorerError, PageExplorer, PageLoad
 
-__all__ = ("ExplorerError", "PageExplorer")
+__all__ = ("ExplorerError", "PageExplorer", "PageLoad")
