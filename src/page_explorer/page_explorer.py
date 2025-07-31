@@ -10,7 +10,7 @@ from logging import getLogger
 from os import environ
 from string import ascii_lowercase, ascii_uppercase
 from time import perf_counter, sleep
-from typing import TYPE_CHECKING, Any, Callable, cast
+from typing import TYPE_CHECKING, Any, Callable
 
 from selenium.common.exceptions import (
     ElementNotInteractableException,
@@ -229,15 +229,13 @@ class PageExplorer:
                         instruction.value  # type: ignore[no-untyped-call]
                     )
                 elif instruction.action == Action.FIND_ELEMENTS:
-                    elements = self._driver.find_elements(
-                        **cast("dict[str, str]", instruction.value)
-                    )
+                    elements = self._driver.find_elements(**instruction.value)
                     if not elements:
                         LOG.debug("no elements found!")
                 elif instruction.action == Action.KEY_DOWN:
-                    actions.key_down(cast("str", instruction.value)).perform()
+                    actions.key_down(instruction.value).perform()
                 elif instruction.action == Action.KEY_UP:
-                    actions.key_up(cast("str", instruction.value)).perform()
+                    actions.key_up(instruction.value).perform()
                 elif instruction.action == Action.SEND_KEYS:
                     if elements is not None:
                         for element in elements:
@@ -245,20 +243,16 @@ class PageExplorer:
                                 ElementNotInteractableException,
                                 StaleElementReferenceException,
                             ):
-                                element.send_keys(
-                                    *cast("tuple[str, ...]", instruction.value)
-                                )
+                                element.send_keys(*instruction.value)
                             if instruction.delay > 0:
                                 wait_cb(instruction.delay)
                     else:
                         for _ in range(instruction.runs):
-                            actions.send_keys(
-                                *cast("tuple[str, ...]", instruction.value)
-                            ).perform()
+                            actions.send_keys(*instruction.value).perform()
                             if instruction.delay > 0:
                                 wait_cb(instruction.delay)
                 elif instruction.action == Action.WAIT:
-                    wait_cb(cast("float", instruction.value))
+                    wait_cb(instruction.value)
             # all instructions complete
             success = True
         except HTTPError as exc:
