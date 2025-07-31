@@ -230,14 +230,14 @@ class PageExplorer:
                     )
                 elif instruction.action == Action.FIND_ELEMENTS:
                     elements = self._driver.find_elements(
-                        **cast(dict[str, str], instruction.value)
+                        **cast("dict[str, str]", instruction.value)
                     )
                     if not elements:
                         LOG.debug("no elements found!")
                 elif instruction.action == Action.KEY_DOWN:
-                    actions.key_down(cast(str, instruction.value)).perform()
+                    actions.key_down(cast("str", instruction.value)).perform()
                 elif instruction.action == Action.KEY_UP:
-                    actions.key_up(cast(str, instruction.value)).perform()
+                    actions.key_up(cast("str", instruction.value)).perform()
                 elif instruction.action == Action.SEND_KEYS:
                     if elements is not None:
                         for element in elements:
@@ -246,19 +246,19 @@ class PageExplorer:
                                 StaleElementReferenceException,
                             ):
                                 element.send_keys(
-                                    *cast(tuple[str, ...], instruction.value)
+                                    *cast("tuple[str, ...]", instruction.value)
                                 )
                             if instruction.delay > 0:
                                 wait_cb(instruction.delay)
                     else:
                         for _ in range(instruction.runs):
                             actions.send_keys(
-                                *cast(tuple[str, ...], instruction.value)
+                                *cast("tuple[str, ...]", instruction.value)
                             ).perform()
                             if instruction.delay > 0:
                                 wait_cb(instruction.delay)
                 elif instruction.action == Action.WAIT:
-                    wait_cb(cast(float, instruction.value))
+                    wait_cb(cast("float", instruction.value))
             # all instructions complete
             success = True
         except HTTPError as exc:
