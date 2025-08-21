@@ -141,6 +141,7 @@ class PageExplorer:
         options = Options()
         options.binary_location = str(binary)
         options.page_load_strategy = page_load_strategy
+        options.unhandled_prompt_behavior = "accept"
         service = Service(
             service_args=[f"--marionette-port={port}", "--connect-existing"],
         )
