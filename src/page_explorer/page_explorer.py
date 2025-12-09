@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING, Any, Callable
 
 from selenium.common.exceptions import (
     ElementNotInteractableException,
+    NoSuchWindowException,
     StaleElementReferenceException,
     WebDriverException,
 )
@@ -292,16 +293,16 @@ class PageExplorer:
         return PageLoad.FAILURE
 
     def is_connected(self) -> bool:
-        """Check if a page is open and connection is active.
+        """Check if the browser is running and the connection is active.
 
         Args:
             None
 
         Returns:
-            True if a page is open and connection is active otherwise False.
+            True if connected to the browser otherwise False.
         """
-        with suppress(HTTPError, WebDriverException):
-            return isinstance(self._driver.title, str)
+        with suppress(HTTPError, NoSuchWindowException, WebDriverException):
+            return isinstance(self._driver.current_window_handle, str)
         return False
 
     def shutdown(self) -> None:

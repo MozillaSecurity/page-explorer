@@ -41,18 +41,20 @@ def test_page_explorer_create(mocker, exc):
 
 
 @mark.parametrize(
-    "title_effect, result",
+    "cwh_effect, result",
     (
         # connected
-        (("foo",), True),
+        (("ef101f53-3f1f-4c20-9d6c-98912d9d72f3",), True),
         # not connected
         ((WebDriverException("test"),), False),
     ),
 )
-def test_page_explorer_is_connected(mocker, title_effect, result):
+def test_page_explorer_is_connected(mocker, cwh_effect, result):
     """test PageExplorer.is_connected()"""
     driver = mocker.patch("page_explorer.page_explorer.FirefoxDriver", autospec=True)
-    type(driver.return_value).title = mocker.PropertyMock(side_effect=title_effect)
+    type(driver.return_value).current_window_handle = mocker.PropertyMock(
+        side_effect=cwh_effect
+    )
 
     with PageExplorer("bin", 1234) as exp:
         assert exp.is_connected() == result
@@ -77,7 +79,7 @@ def test_page_explorer_current_url(mocker, url_effect, result):
 
 
 @mark.parametrize(
-    "title_calls, title_effect, script_effect",
+    "cwh_calls, cwh_effect, script_effect",
     (
         # wait until deadline is exceeded
         (4, repeat("foo"), None),
@@ -87,7 +89,7 @@ def test_page_explorer_current_url(mocker, url_effect, result):
         (0, (AssertionError("test failed"),), (WebDriverException("test"),)),
     ),
 )
-def test_page_explorer_close_browser(mocker, title_calls, title_effect, script_effect):
+def test_page_explorer_close_browser(mocker, cwh_calls, cwh_effect, script_effect):
     """test PageExplorer.close_browser()"""
     mocker.patch("page_explorer.page_explorer.perf_counter", side_effect=count())
     mocker.patch("page_explorer.page_explorer.sleep", autospec=True)
@@ -95,13 +97,13 @@ def test_page_explorer_close_browser(mocker, title_calls, title_effect, script_e
         "page_explorer.page_explorer.FirefoxDriver", autospec=True
     ).return_value
 
-    fake_title = mocker.PropertyMock(side_effect=title_effect)
-    type(driver).title = fake_title
+    fake_current_window_handle = mocker.PropertyMock(side_effect=cwh_effect)
+    type(driver).current_window_handle = fake_current_window_handle
     driver.execute_script.side_effect = script_effect
     with PageExplorer("bin", 1234) as exp:
         exp.close_browser(wait=5)
     assert driver.execute_script.call_count == 1
-    assert fake_title.call_count == title_calls
+    assert fake_current_window_handle.call_count == cwh_calls
 
 
 @mark.parametrize(
