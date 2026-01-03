@@ -10,7 +10,7 @@ from logging import getLogger
 from os import environ
 from string import ascii_lowercase, ascii_uppercase
 from time import perf_counter, sleep
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any
 
 from selenium.common.exceptions import (
     ElementNotInteractableException,
@@ -27,6 +27,7 @@ from selenium.webdriver.firefox.service import Service
 from urllib3.exceptions import HTTPError
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
 LOG = getLogger(__name__)
@@ -56,7 +57,7 @@ class ExplorerError(Exception):
     """Base exception used by this module."""
 
 
-@dataclass(frozen=True, eq=False)
+@dataclass(frozen=True, eq=False, slots=True)
 class Instruction:
     """Instruction to be executed."""
 
