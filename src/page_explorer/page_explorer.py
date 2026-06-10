@@ -18,12 +18,12 @@ from selenium.common.exceptions import (
     StaleElementReferenceException,
     WebDriverException,
 )
-from selenium.webdriver import Firefox as FirefoxDriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.webdriver import WebDriver as FirefoxDriver
 from urllib3.exceptions import HTTPError
 
 if TYPE_CHECKING:
